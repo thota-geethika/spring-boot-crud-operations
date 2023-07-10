@@ -4,6 +4,7 @@ import com.example.springbootcrudoperations.dto.AddressDto;
 import com.example.springbootcrudoperations.mapper.AddressMapper;
 import com.example.springbootcrudoperations.model.Address;
 import com.example.springbootcrudoperations.repo.AddressRepository;
+import com.example.springbootcrudoperations.repo.AddressSearchDao;
 import com.example.springbootcrudoperations.repo.NewPeersRepository;
 import com.example.springbootcrudoperations.service.AddressService;
 import org.mapstruct.factory.Mappers;
@@ -17,6 +18,9 @@ public class AddressServiceImpl implements AddressService {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private AddressSearchDao addressSearchDao;
 
     @Autowired
     private NewPeersRepository peersRepository;
@@ -61,7 +65,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressDto> getAddressesByPeerIdAndAddressTypeAndAddressDetails(Long peerId, String addressType, String addressDetails) {
-        List<Address> addressList = addressRepository.getByPeerIdAndAddressTypeAndAddressDetails(peerId,addressType,addressDetails);
+        List<Address> addressList = addressSearchDao.findAllBySimpleQuery(peerId,addressType,addressDetails);
         List<AddressDto> addressDtoList = addressMapper.addressListToAddressDtoList(addressList);
         return addressDtoList;
     }
