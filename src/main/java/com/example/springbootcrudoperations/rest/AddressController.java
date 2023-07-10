@@ -29,26 +29,7 @@ public class AddressController {
     public List<AddressDto> getAllAddressesWithTheConditions(@RequestParam(required = true) Long peerId, @RequestParam(required = false) String addressType, @RequestParam(required = false) String addressDetails){
 
         List<AddressDto> addressDtoList;
-        if(peerId != null && addressType!=null && addressDetails!=null)
-        {
-            addressDtoList = addressService.getAddressesByPeerIdAndAddressTypeAndAddressDetails(peerId,addressType,addressDetails);
-            return addressDtoList;
-        }
-        else if(peerId != null && addressType != null)
-        {
-            addressDtoList = addressService.getAddressesByPeerIdAndAddressType(peerId,addressType);
-            return addressDtoList;
-        }
-        else if(peerId != null && addressDetails != null)
-        {
-            addressDtoList = addressService.getAddressesByPeerIdAndAddressDetails(peerId,addressDetails);
-            return addressDtoList;
-        }
-        else { // id != null
-            addressDtoList = addressService.getAddressesByPeerId(peerId);
-            return addressDtoList;
-        }
+        addressDtoList = addressService.getAddressesByPeerIdAndAddressTypeAndAddressDetails(peerId,addressType,addressDetails);
+        return addressDtoList;
     }
-
-
 }

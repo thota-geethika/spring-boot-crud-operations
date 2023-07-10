@@ -29,12 +29,6 @@ public class AddressServiceImpl implements AddressService {
     public AddressDto addAddress(AddressDto addressDto) {
         Address entity = addressMapper.addressDtoToAddress(addressDto);
         Address address = addressRepository.save(entity);
-//        System.out.println(address);
-//        List<Address> addresses = (List<Address>) addressRepository.findAll();
-//        for (Address i:
-//                addresses) {
-//            System.out.println(i);
-//        }
         return addressMapper.addressToAddressDto(address);
     }
 
@@ -48,20 +42,6 @@ public class AddressServiceImpl implements AddressService {
         return addressMapper.addressListToAddressDtoList(addresses);
     }
 
-    @Override
-    public List<AddressDto> getAddressesByPeerId(Long peerId) {
-//        List<Address> addressesList = (List<Address>) addressRepository.findAll();
-        List<Address> addressList = addressRepository.getByPeerId(peerId);
-        List<AddressDto> addressDtoList = addressMapper.addressListToAddressDtoList(addressList);
-        return addressDtoList;
-    }
-
-    @Override
-    public List<AddressDto> getAddressesByPeerIdAndAddressType(Long peerId, String addressType) {
-        List<Address> addressList = addressRepository.getByPeerIdAndAddressType(peerId,addressType);
-        List<AddressDto> addressDtoList = addressMapper.addressListToAddressDtoList(addressList);
-        return addressDtoList;
-    }
 
     @Override
     public List<AddressDto> getAddressesByPeerIdAndAddressTypeAndAddressDetails(Long peerId, String addressType, String addressDetails) {
@@ -70,10 +50,4 @@ public class AddressServiceImpl implements AddressService {
         return addressDtoList;
     }
 
-    @Override
-    public List<AddressDto> getAddressesByPeerIdAndAddressDetails(Long peerId, String addressDetails) {
-        List<Address> addressList = addressRepository.getByPeerIdAndAddressDetails(peerId,addressDetails);
-        List<AddressDto> addressDtoList = addressMapper.addressListToAddressDtoList(addressList);
-        return addressDtoList;
-    }
 }

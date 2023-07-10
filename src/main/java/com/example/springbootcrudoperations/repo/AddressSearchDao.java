@@ -24,32 +24,31 @@ public class AddressSearchDao {
 
         CriteriaQuery<Address> criteriaQuery = criteriaBuilder.createQuery(Address.class);
 
+        List<Predicate> predicates = new ArrayList<>();
+
         //select * from Address;
         Root<Address> root = criteriaQuery.from(Address.class);
 
-        //prepare where clause
-        // where peerId like
-        Predicate peerIdPredicate = criteriaBuilder.
-                equal(root.get("newPeer").get("id"),peerId);
+        if(peerId != null){
+            Predicate peerIdPredicate = criteriaBuilder.
+                    equal(root.get("newPeer").get("id"),peerId);
+            predicates.add(peerIdPredicate);
+        }
 
-        Predicate addressTypePredicate = criteriaBuilder.
-                equal(root.get("addressType"),addressType);
+        if(addressType != null){
+            Predicate addressTypePredicate = criteriaBuilder.
+                    equal(root.get("addressType"),addressType);
+            predicates.add(addressTypePredicate);
+        }
 
-        Predicate addressDetailsPredicate = criteriaBuilder.
-                equal(root.get("addressDetails"),addressDetails);
+        if(addressDetails != null){
+            Predicate addressDetailsPredicate = criteriaBuilder.
+                    equal(root.get("addressDetails"),addressDetails);
+            predicates.add(addressDetailsPredicate);
+        }
 
-        Predicate peerIdOrAddressTypeOrAddressDetailsPredicate = criteriaBuilder.and(
-                peerIdPredicate,
-                addressTypePredicate,
-                addressDetailsPredicate
-        );
-
-        criteriaQuery.where(peerIdOrAddressTypeOrAddressDetailsPredicate);
+        criteriaQuery.where(predicates.toArray(new Predicate[0]));
         TypedQuery<Address> query = em.createQuery(criteriaQuery);
         return query.getResultList();
-
-
-
-
     }
 }
