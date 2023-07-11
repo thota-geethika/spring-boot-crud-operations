@@ -1,12 +1,14 @@
 package com.example.springbootcrudoperations.service.impl;
 
 import com.example.springbootcrudoperations.dto.NewPeerDto;
+import com.example.springbootcrudoperations.exception.UserNotFoundException;
 import com.example.springbootcrudoperations.mapper.NewPeerMapper;
 import com.example.springbootcrudoperations.model.NewPeer;
 import com.example.springbootcrudoperations.repo.NewPeersRepository;
 import com.example.springbootcrudoperations.service.CrudService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,11 +36,16 @@ public class CrudServiceImplementation implements CrudService {
     }
 
     @Override
-    public NewPeerDto getPeerWithTheId(long id){
-
-        return newPeerMapper.newPeerToNewPeerDto(newPeersRepository.findById(id).orElse(null));
-
-
+    public NewPeerDto getPeerWithTheId(long id) throws UserNotFoundException {
+        Optional<NewPeer> newPeer = newPeersRepository.findById(id);
+        if(newPeer.isPresent())
+        {
+            NewPeerDto newPeerDto = newPeerMapper.newPeerToNewPeerDto(newPeer.get());
+            return newPeerDto;
+        }
+        throw UserNotFoundException.badRequest("User not found with id: "+id);
+//        throw new UserNotFoundException.("User not found with id: "+id);
+//        return newPeerMapper.newPeerToNewPeerDto(newPeersRepository.findById(id).orElse(null));
     }
 
     @Override

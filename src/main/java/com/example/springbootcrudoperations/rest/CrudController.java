@@ -1,9 +1,12 @@
 package com.example.springbootcrudoperations.rest;
 
 import com.example.springbootcrudoperations.dto.NewPeerDto;
+import com.example.springbootcrudoperations.dto.ResponseDto;
+import com.example.springbootcrudoperations.exception.UserNotFoundException;
 import com.example.springbootcrudoperations.service.CrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +23,10 @@ public class CrudController {
 
     @PostMapping("/addPeer")
     public NewPeerDto addAPeer(@RequestBody NewPeerDto newPeerDto) {
-        return crudService.savePeer(newPeerDto);
+        System.out.println(newPeerDto);
+        NewPeerDto newPeerDto1 = crudService.savePeer(newPeerDto);
+        log.info("newPeerDto1: ",newPeerDto1);
+        return newPeerDto1;
     }
 
     @GetMapping("/peers")
@@ -31,8 +37,12 @@ public class CrudController {
     }
 
     @GetMapping("/peers/{id}")
-    public NewPeerDto getPeerWithAGivenId(@PathVariable long id) {
-        return crudService.getPeerWithTheId(id);
+    public ResponseEntity<?> getPeerWithAGivenId(@PathVariable long id) throws UserNotFoundException {
+        ResponseDto response = ResponseDto.builder()
+                .status("SUCCESS")
+                .data(crudService.getPeerWithTheId(id))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/peers/{id}")
