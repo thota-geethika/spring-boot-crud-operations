@@ -1,6 +1,7 @@
 package com.example.springbootcrudoperations.service.impl;
 
 import com.example.springbootcrudoperations.dto.NewPeerDto;
+import com.example.springbootcrudoperations.dto.ResponseDto;
 import com.example.springbootcrudoperations.exception.UserNotFoundException;
 import com.example.springbootcrudoperations.mapper.NewPeerMapper;
 import com.example.springbootcrudoperations.model.NewPeer;
@@ -9,6 +10,7 @@ import com.example.springbootcrudoperations.service.CrudService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,52 +24,66 @@ public class CrudServiceImplementation implements CrudService {
     private NewPeersRepository newPeersRepository;
 
     @Override
-    public NewPeerDto savePeer(NewPeerDto newPeerDto) {
-        NewPeer peerEntity = newPeerMapper.newPeerDtoToNewPeer(newPeerDto);
-        NewPeer newPeer = newPeersRepository.save(peerEntity);
-        return newPeerMapper.newPeerToNewPeerDto(newPeer);
+    public ResponseDto savePeer(NewPeerDto newPeerDto) {
+        NewPeer newPeer = newPeerMapper.newPeerDtoToNewPeer(newPeerDto);
+        newPeer = newPeersRepository.save(newPeer);
+        NewPeerDto newPeerDto1 = newPeerMapper.newPeerToNewPeerDto(newPeer);
+        ResponseDto response = ResponseDto.builder()
+                .status("SUCCESS")
+                .message("Added user to the database.")
+                .data(newPeerDto1)
+                .build();
+        return response;
 //        return newPeerDto;
     }
 
     @Override
-    public List<NewPeerDto> givePeersList() {
+    public ResponseDto givePeersList() {
         List<NewPeer> newPeers = (List<NewPeer>) newPeersRepository.findAll();
-        return newPeerMapper.newPeerListToNewPeerDtoList(newPeers);
+        List<NewPeerDto> newPeerDtoList = newPeerMapper.newPeerListToNewPeerDtoList(newPeers);
+        ResponseDto response = ResponseDto.builder()
+                .status("SUCCESS")
+                .data(newPeerDtoList)
+                .build();
+        return response;
     }
 
     @Override
-    public NewPeerDto getPeerWithTheId(long id) throws UserNotFoundException {
-        Optional<NewPeer> newPeer = newPeersRepository.findById(id);
-        if(newPeer.isPresent())
-        {
-            NewPeerDto newPeerDto = newPeerMapper.newPeerToNewPeerDto(newPeer.get());
-            return newPeerDto;
-        }
-        throw UserNotFoundException.badRequest("User not found with id: "+id);
-//        throw new UserNotFoundException.("User not found with id: "+id);
-//        return newPeerMapper.newPeerToNewPeerDto(newPeersRepository.findById(id).orElse(null));
+    public ResponseDto getPeerWithTheId(long id) throws UserNotFoundException {
+        NewPeer newPeer = newPeersRepository.findById(id)
+                .orElseThrow(() -> UserNotFoundException.badRequest("User not found with id: "+id));
+            NewPeerDto newPeerDto = newPeerMapper.newPeerToNewPeerDto(newPeer);
+            ResponseDto response = ResponseDto.builder()
+                    .status("SUCCESS")
+                    .data(newPeerDto)
+                    .build();
+            return response;
     }
 
     @Override
-    public void deletePeerWithId(long id) {
-
+    public ResponseDto deletePeerWithId(long id) {
+        ResponseDto response = getPeerWithTheId(id);
         newPeersRepository.deleteById(id);
-
+        response.setMessage("Successfully Deleted the user with id: "+id);
+        return response;
     }
 
     @Override
-    public NewPeerDto updatePeerWithTheId(long id, NewPeerDto newPeerDto) {
+    public ResponseDto updatePeerWithTheId(long id, NewPeerDto newPeerDto) {
 
-        Optional<NewPeer> newPeerResponse = newPeersRepository.findById(id);
-        NewPeer newPeer1 = null;
-        if(newPeerResponse.isPresent())
-        {
-            newPeer1 = newPeerResponse.get();
-            newPeer1.setPeerName(newPeerDto.getPeerName());
-            newPeer1.setEmail(newPeerDto.getEmail());
-        }
+        NewPeer newPeer = newPeersRepository.findById(id).orElseThrow(() -> UserNotFoundException.badRequest("User not found with id: "+id));
 
-        return newPeerMapper.newPeerToNewPeerDto(newPeer1);
+        newPeer.setPeerName(newPeerDto.getPeerName());
+        newPeer.setEmail(newPeerDto.getEmail());
 
+        newPeerDto = newPeerMapper.newPeerToNewPeerDto(newPeer);
+
+        ResponseDto response = ResponseDto.builder()
+                .status("SUCCESS")
+                .message("Details of User with "+id+" are successfully updated.")
+                .data(newPeerDto)
+                .build();
+
+        return response;
     }
 }
